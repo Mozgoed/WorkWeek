@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>График Леоновой</title>
+  <title>График</title>
   <style>
     body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
     label { display: block; margin-top: 15px; }
@@ -13,11 +13,11 @@
   </style>
 </head>
 <body>
-  <h2>График Леоновой Л.В.</h2>
+  <h2>График</h2>
 
   <label>
     Дата начала шаблона:
-    <input type="date" id="startDate" value="2025-05-01">
+    <input type="date" id="startDate" value="2025-05-02">
   </label>
 
   <label>
@@ -30,7 +30,7 @@
   <div class="result" id="result"></div>
 
   <script>
-    const template = ["н", "в", "д", "д", "н", "в", "в"];
+    const template = [" ", " ", " ", "д", "д", " ", "н", "н"];
     const weekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
 
     function showSchedule() {
