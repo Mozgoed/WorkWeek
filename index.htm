@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>График Леоновой</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    label { display: block; margin-top: 15px; }
+    button { margin-top: 20px; padding: 10px; width: 100%; }
+    .result { margin-top: 20px; }
+    .day { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h2>График Леоновой Л.В.</h2>
+
+  <label>
+    Дата начала шаблона:
+    <input type="date" id="startDate" value="2025-05-01">
+  </label>
+
+  <label>
+    Начало недели:
+    <input type="date" id="weekStart">
+  </label>
+
+  <button onclick="showSchedule()">Показать график</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const template = ["н", "в", "д", "д", "н", "в", "в"];
+    const weekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+
+    function showSchedule() {
+      const startDate = new Date(document.getElementById("startDate").value);
+      const weekStart = new Date(document.getElementById("weekStart").value);
+      const resultDiv = document.getElementById("result");
+
+      if (isNaN(startDate) || isNaN(weekStart)) {
+        resultDiv.innerHTML = "<p style='color:red'>Пожалуйста, выберите обе даты.</p>";
+        return;
+      }
+
+      let html = `<h3>Неделя: ${weekStart.toLocaleDateString()} - ${new Date(weekStart.getTime() + 6*86400000).toLocaleDateString()}</h3>`;
+
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(weekStart.getTime() + i * 86400000);
+        const diffDays = Math.floor((dayDate - startDate) / 86400000);
+        const templateIndex = ((diffDays % template.length) + template.length) % template.length; // корректный индекс
+        const shift = template[templateIndex];
+        html += `<div class="day">${weekdays[i]} ${dayDate.toLocaleDateString()}: <strong>${shift}</strong></div>`;
+      }
+
+      resultDiv.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
