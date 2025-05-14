@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>График</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+    body { font-family: sans-serif; padding: 20px; max-width: 900px; margin: auto; }
     label { display: block; margin-top: 15px; }
     button { margin-top: 20px; padding: 10px; width: 100%; }
-    .result { margin-top: 20px; }
-    .day { margin: 5px 0; }
+    .calendar-wrapper { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+    table { border-collapse: collapse; width: 100%; max-width: 400px; }
+    th, td { border: 1px solid #ccc; width: 14.28%; text-align: center; padding: 5px; }
+    th { background-color: #f0f0f0; }
+    .weekend { background-color: #f9f9f9; }
+    .month-title { text-align: center; font-weight: bold; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -20,40 +24,86 @@
     <input type="date" id="startDate" value="2025-05-02">
   </label>
 
-  <label>
-    Начало недели:
-    <input type="date" id="weekStart">
-  </label>
+  <button onclick="showMonthlySchedules()">Показать график на два месяца</button>
 
-  <button onclick="showSchedule()">Показать график</button>
-
-  <div class="result" id="result"></div>
+  <div class="calendar-wrapper" id="calendarWrapper"></div>
 
   <script>
     const template = [" ", " ", " ", "д", "д", " ", "н", "н"];
-    const weekdays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+    const weekdays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const months = [
+      "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+      "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ];
 
-    function showSchedule() {
+    function showMonthlySchedules() {
       const startDate = new Date(document.getElementById("startDate").value);
-      const weekStart = new Date(document.getElementById("weekStart").value);
-      const resultDiv = document.getElementById("result");
+      const wrapper = document.getElementById("calendarWrapper");
+      wrapper.innerHTML = "";
 
-      if (isNaN(startDate) || isNaN(weekStart)) {
-        resultDiv.innerHTML = "<p style='color:red'>Пожалуйста, выберите обе даты.</p>";
-        return;
+      const firstMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      const secondMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+
+      wrapper.appendChild(generateMonthTable(firstMonth, startDate));
+      wrapper.appendChild(generateMonthTable(secondMonth, startDate));
+    }
+
+    function generateMonthTable(monthStartDate, templateStartDate) {
+      const year = monthStartDate.getFullYear();
+      const month = monthStartDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const table = document.createElement("table");
+      const caption = document.createElement("caption");
+      caption.className = "month-title";
+      caption.innerText = `${months[month]} ${year}`;
+      table.appendChild(caption);
+
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      weekdays.forEach(day => {
+        const th = document.createElement("th");
+        th.innerText = day;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      let row = document.createElement("tr");
+
+      let firstDay = new Date(year, month, 1).getDay();
+      if (firstDay === 0) firstDay = 7;
+
+      for (let i = 1; i < firstDay; i++) {
+        row.appendChild(document.createElement("td"));
       }
 
-      let html = `<h3>Неделя: ${weekStart.toLocaleDateString()} - ${new Date(weekStart.getTime() + 6*86400000).toLocaleDateString()}</h3>`;
-
-      for (let i = 0; i < 7; i++) {
-        const dayDate = new Date(weekStart.getTime() + i * 86400000);
-        const diffDays = Math.floor((dayDate - startDate) / 86400000);
+      for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(year, month, day);
+        const cell = document.createElement("td");
+        const diffDays = Math.floor((currentDate - templateStartDate) / 86400000);
         const templateIndex = ((diffDays % template.length) + template.length) % template.length;
         const shift = template[templateIndex];
-        html += `<div class="day">${weekdays[i]} : <strong>${shift}</strong></div>`;
+        const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6;
+        cell.className = isWeekend ? "weekend" : "";
+        cell.innerHTML = `<div>${day}</div><div><strong>${shift}</strong></div>`;
+        row.appendChild(cell);
+
+        if ((currentDate.getDay() === 0)) {
+          tbody.appendChild(row);
+          row = document.createElement("tr");
+        }
       }
 
-      resultDiv.innerHTML = html;
+      if (row.children.length > 0) {
+        while (row.children.length < 7) {
+          row.appendChild(document.createElement("td"));
+        }
+        tbody.appendChild(row);
+      }
+
+      table.appendChild(tbody);
+      return table;
     }
   </script>
 </body>
