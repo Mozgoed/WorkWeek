@@ -5,10 +5,20 @@ const months = [
   "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
 ];
 
-window.onload = showMonthlySchedules;
+let currentStartDate = "2025-08-05";
 
-function showMonthlySchedules() {
-  const startDate = new Date("2025-08-05");
+window.onload = function() {
+  showMonthlySchedules(currentStartDate);
+  const btn = document.getElementById("updateCalendarBtn");
+  btn.addEventListener("click", function() {
+    const input = document.getElementById("startDateInput");
+    currentStartDate = input.value;
+    showMonthlySchedules(currentStartDate);
+  });
+};
+
+function showMonthlySchedules(startDateStr) {
+  const startDate = new Date(startDateStr);
   const wrapper = document.getElementById("calendarWrapper");
   wrapper.innerHTML = "";
 
@@ -80,4 +90,3 @@ function generateMonthTable(monthStartDate, templateStartDate) {
   table.appendChild(tbody);
   return table;
 }
-
